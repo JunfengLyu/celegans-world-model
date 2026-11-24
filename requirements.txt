@@ -1,0 +1,15 @@
+# Tested with CPython 3.13 on Apple Silicon. A full resolved lock is also provided.
+h5py==3.16.0
+imageio==2.38.2
+imageio-ffmpeg==0.8.1
+ipython==9.19.1
+matplotlib==3.11.2
+numpy==2.5.5
+openpyxl==3.1.5
+pandas==3.1.1
+scikit-learn==1.9.1
+scipy==1.18.1
+statsmodels==0.15.0
+threadpoolctl==3.8.0
+torch==2.15.0
+xlrd==2.0.2

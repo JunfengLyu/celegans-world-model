@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Statistical dynamics of locomotion in a virtual C. elegans</title>
+  <style>
+    :root { color-scheme: light; color: #202838; background: #f5f7fa; }
+    body { margin: 0; font: 1rem/1.6 system-ui, sans-serif; }
+    main { max-width: 67rem; padding: clamp(1rem, 4vw, 3rem); margin: auto; }
+    header { padding: .5rem 0 1.25rem; border-bottom: 1px solid #ccd5e1; }
+    h1, h2 { line-height: 1.2; }
+    h1 { font: 600 clamp(2rem, 4.4vw, 3.5rem)/1.08 Georgia, serif; max-width: 21ch; }
+    h2 { font-size: 1.2rem; margin-top: 0; }
+    p { max-width: 75ch; }
+    a { color: #174ba0; text-underline-offset: .18em; }
+    nav { display: flex; gap: 1rem 1.5rem; flex-wrap: wrap; }
+    section { margin-top: 1.5rem; }
+    article { background: white; border: 1px solid #d8e0ea; border-radius: .55rem; padding: 1rem; }
+    .demos { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #hybrid-rollout { grid-column: 1 / -1; }
+    video { width: 100%; height: auto; display: block; background: #f5f7fa; }
+    footer { margin-top: 1.5rem; border-top: 1px solid #ccd5e1; font-size: .9rem; }
+    @media (max-width: 44rem) { .demos { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Statistical dynamics of locomotion in a virtual <i>C. elegans</i></h1>
+      <p>Supplemental videos for Junfeng Lyu’s Neuroethology essay, Peking University.</p>
+      <nav aria-label="Project links">
+        <a href="https://github.com/JunfengLyu/celegans-world-model">Source code and reproduction instructions</a>
+        <a href="https://junfenglyu.github.io/">Author’s homepage</a>
+      </nav>
+    </header>
+    <section class="demos" aria-label="Supplemental videos">
+      <article id="hybrid-rollout">
+        <h2>S3. Matched posture rollouts</h2>
+        <video controls playsinline preload="metadata" aria-label="Matched posture rollouts">
+          <source src="essay/demos/hybrid-rollout.mp4" type="video/mp4">
+          <a href="essay/demos/hybrid-rollout.mp4">Open the MP4</a>
+        </video>
+        <p>The first eligible histories of held-out worms 6 and 12 initialize the baseline GRU and the phase-embedded GRU. Each model generates one stochastic continuation at training seed 17.</p>
+        <a href="essay/demos/hybrid-rollout.mp4" download>Download MP4</a>
+      </article>
+      <article id="connectome-touch">
+        <h2>S1. Connectome and posterior touch</h2>
+        <video controls playsinline preload="metadata" aria-label="Connectome and posterior touch">
+          <source src="essay/demos/connectome-touch.mp4" type="video/mp4">
+          <a href="essay/demos/connectome-touch.mp4">Open the MP4</a>
+        </video>
+        <p>Simulated touch-minus-sham voltage is registered to named cells in the Virtual Worm atlas. The two trajectories show the simulated body response.</p>
+        <a href="essay/demos/connectome-touch.mp4" download>Download MP4</a>
+      </article>
+      <article id="eigenworm-phase">
+        <h2>S2. Observed eigenworm phase</h2>
+        <video controls playsinline preload="metadata" aria-label="Observed eigenworm phase">
+          <source src="essay/demos/eigenworm-phase.mp4" type="video/mp4">
+          <a href="essay/demos/eigenworm-phase.mp4">Open the MP4</a>
+        </video>
+        <p>A measured posture sequence is reconstructed from the five published coefficients alongside its trajectory in the first two modes.</p>
+        <a href="essay/demos/eigenworm-phase.mp4" download>Download MP4</a>
+      </article>
+    </section>
+    <footer>
+      <p>Atlas geometry by Chris Grove for <a href="https://caltech.wormbase.org/virtualworm/">WormBase and Caltech</a>. See the repository for <a href="https://github.com/JunfengLyu/celegans-world-model/blob/main/docs/DATA.md">data provenance</a> and <a href="https://github.com/JunfengLyu/celegans-world-model/blob/main/essay/data/ATLAS-NOTICE.txt">atlas attribution</a>.</p>
+    </footer>
+  </main>
+</body>
+</html>

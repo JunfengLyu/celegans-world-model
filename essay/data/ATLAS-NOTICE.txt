@@ -1,0 +1,33 @@
+The atlas subset in virtual-worm-atlas.json and the geometry used in
+connectome-touch.mp4 derive from the Virtual Worm model built by Chris Grove
+for WormBase at the California Institute of Technology.
+https://caltech.wormbase.org/virtualworm/
+
+Cuticle and organs were extracted from the Virtual Worm March 2011 mesh
+distributed with Blender2NeuroML at commit 598081825349ed72de788f005db5b30ff5168ffa.
+https://github.com/openworm/Blender2NeuroML/tree/598081825349ed72de788f005db5b30ff5168ffa
+
+Neuron morphologies come from c302 at commit d542a44bf2662f79e0ad23342a959a181a920877.
+https://github.com/openworm/c302/tree/d542a44bf2662f79e0ad23342a959a181a920877
+
+MIT License
+Copyright (c) 2013 OpenWorm (Blender2NeuroML)
+Copyright (c) 2024 OpenWorm (c302)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
