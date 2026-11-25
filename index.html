@@ -17,11 +17,9 @@
     nav { display: flex; gap: 1rem 1.5rem; flex-wrap: wrap; }
     section { margin-top: 1.5rem; }
     article { background: white; border: 1px solid #d8e0ea; border-radius: .55rem; padding: 1rem; }
-    .demos { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    #hybrid-rollout { grid-column: 1 / -1; }
+    .demos { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
     video { width: 100%; height: auto; display: block; background: #f5f7fa; }
     footer { margin-top: 1.5rem; border-top: 1px solid #ccd5e1; font-size: .9rem; }
-    @media (max-width: 44rem) { .demos { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -35,15 +33,6 @@
       </nav>
     </header>
     <section class="demos" aria-label="Supplemental videos">
-      <article id="hybrid-rollout">
-        <h2>S3. Matched posture rollouts</h2>
-        <video controls playsinline preload="metadata" aria-label="Matched posture rollouts">
-          <source src="essay/demos/hybrid-rollout.mp4" type="video/mp4">
-          <a href="essay/demos/hybrid-rollout.mp4">Open the MP4</a>
-        </video>
-        <p>The first eligible histories of held-out worms 6 and 12 initialize the baseline GRU and the phase-embedded GRU. Each model generates one stochastic continuation at training seed 17. The same Virtual Worm cuticle profile follows every reconstructed centerline.</p>
-        <a href="essay/demos/hybrid-rollout.mp4" download>Download MP4</a>
-      </article>
       <article id="connectome-touch">
         <h2>S1. Connectome and posterior touch</h2>
         <video controls playsinline preload="metadata" aria-label="Connectome and posterior touch">
@@ -61,6 +50,15 @@
         </video>
         <p>The Virtual Worm cuticle follows the centerline reconstructed from five measured posture coefficients. The adjacent plot follows the first two coefficients through time.</p>
         <a href="essay/demos/eigenworm-phase.mp4" download>Download MP4</a>
+      </article>
+      <article id="hybrid-rollout">
+        <h2>S3. Matched posture rollouts</h2>
+        <video controls playsinline preload="metadata" aria-label="Matched posture rollouts">
+          <source src="essay/demos/hybrid-rollout.mp4" type="video/mp4">
+          <a href="essay/demos/hybrid-rollout.mp4">Open the MP4</a>
+        </video>
+        <p>The first eligible histories of held-out worms 6 and 12 initialize the baseline GRU and the phase-embedded GRU. Each model generates one stochastic continuation at training seed 17. The same Virtual Worm cuticle profile follows every reconstructed centerline.</p>
+        <a href="essay/demos/hybrid-rollout.mp4" download>Download MP4</a>
       </article>
     </section>
     <footer>
