@@ -11,6 +11,7 @@ from matplotlib.patches import Circle
 import numpy as np
 
 from behavior_figure import ESSAY, example_contours, plt, style_axis
+from worm_render import draw_worm, load_cuticle_profile
 from wormlab.data import FPS, SPLIT, centerlines, read_basis, read_worms
 
 
@@ -45,9 +46,9 @@ def make_video(destination, seconds):
 
     body.set(xlim=(-0.59, 0.59), ylim=(-0.38, 0.38), aspect="equal")
     body.set_axis_off()
-    body_line, = body.plot([], [], c=color, lw=4, solid_capstyle="round")
-    two_mode_line, = body.plot([], [], c="#272727", lw=1.25, ls=(0, (3, 2)))
-    endpoint, = body.plot([], [], c=color, marker="o", ms=6, linestyle="none")
+    body_cuticle = draw_worm(body, bodies[0], load_cuticle_profile(), color, linewidth=1.05)
+    two_mode_line, = body.plot([], [], c="#272727", lw=1.25, ls=(0, (3, 2)), zorder=4)
+    endpoint, = body.plot([], [], c=color, marker="o", ms=5, linestyle="none", zorder=5)
     body.plot([-0.51, -0.26], [-0.30, -0.30], c="#3e3e3e", lw=1.6)
     body.text(-0.23, -0.30, "$0.25L$", fontsize=16, va="center", ha="left")
     time_label = fig.text(0.10, 0.82, "", va="center")
@@ -71,7 +72,7 @@ def make_video(destination, seconds):
     writer = FFMpegWriter(fps=FPS, codec="libx264", extra_args=["-pix_fmt", "yuv420p", "-movflags", "+faststart"])
     with writer.saving(fig, str(destination), dpi=120):
         for frame, (xy, reduced_xy, value) in enumerate(zip(bodies, reduced, phase_path)):
-            body_line.set_data(xy.T)
+            body_cuticle.set_centerline(xy)
             two_mode_line.set_data(reduced_xy.T)
             endpoint.set_data(xy[:1].T)
             moving.set_data(value[None].T)

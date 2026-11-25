@@ -1,4 +1,4 @@
-# Phase–amplitude dynamics in a virtual *C. elegans*
+# Learning and behavioral physics in virtual *C. elegans*: A phase–amplitude hybrid
 
 The three H.264 originals are in [`demos/`](demos) and stream on the [project's GitHub Pages site](https://junfenglyu.github.io/celegans-world-model/). The analysis and plotting scripts below reproduce the figures and movies used in the essay.
 

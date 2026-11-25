@@ -131,8 +131,8 @@ def style_axis(axis):
     axis.tick_params(length=2.7, pad=2)
 
 
-def field_colorbar(figure, axis, mesh, ticks, labels):
-    bar = figure.colorbar(mesh, ax=axis, pad=0.065, shrink=0.92, aspect=15, ticks=ticks)
+def field_colorbar(figure, axis, mesh, ticks, labels, cax=None):
+    bar = figure.colorbar(mesh, ax=axis, cax=cax, pad=0.065, shrink=0.92, aspect=15, ticks=ticks)
     bar.outline.set_linewidth(0.45)
     bar.ax.minorticks_off()
     bar.set_ticks(ticks, labels=labels)
@@ -161,9 +161,13 @@ def draw_figure(worms, basis, markov, output):
     table = plt.colormaps["cmr.cosmic"]
     contour_colors = table(np.linspace(0.30, 0.79, len(frames)))
     data_color, markov_color = plt.colormaps["cmr.fusion"]([0.28, 0.72])
-    figure, axes = plt.subplots(2, 2, figsize=(6.85, 3.36))
-    figure.subplots_adjust(left=0.095, right=0.97, bottom=0.112, top=0.951, wspace=0.36, hspace=0.45)
-    silhouette, occupation, drift, memories = axes.flat
+    figure = plt.figure(figsize=(6.85, 3.36))
+    silhouette = figure.add_axes((0.043, 0.542, 0.332, 0.422))
+    key = figure.add_axes((0.383, 0.565, 0.197, 0.395))
+    occupation = figure.add_axes((0.665, 0.567, 0.209, 0.406))
+    occupancy_scale = figure.add_axes((0.889, 0.592, 0.013, 0.348))
+    lower = figure.add_gridspec(1, 2, left=0.095, right=0.97, bottom=0.112, top=0.448, wspace=0.36)
+    drift, memories = figure.add_subplot(lower[0, 0]), figure.add_subplot(lower[0, 1])
 
     offsets = ((-0.57, 0.34), (0.57, 0.34), (-0.57, -0.32), (0.57, -0.32))
     for a, b, t, color, (x, y) in zip(full, reduced, frames, contour_colors, offsets):
@@ -171,17 +175,21 @@ def draw_figure(worms, basis, markov, output):
         silhouette.plot(b[:, 0] + x, b[:, 1] + y, color="#333338", lw=0.94,
                         ls=(0, (3.4, 2.4)), zorder=4)
         silhouette.text(x, y - 0.22, f"{t / FPS:.2f} s", ha="center", va="top")
-    silhouette.plot([-0.25, 0.0], [-0.77, -0.77], color="#383838", lw=1.1)
-    silhouette.text(0.05, -0.77, "$0.25L$", ha="left", va="center", fontsize=9.2)
-    silhouette.set(xlim=(-1.07, 1.07), ylim=(-0.86, 0.62), aspect="equal")
+    silhouette.set(xlim=(-1.07, 1.07), ylim=(-0.695, 0.60), aspect="equal")
     silhouette.set_axis_off()
+    key.set_axis_off()
     handles = [
-        Patch(facecolor=contour_colors[1], alpha=0.73, linewidth=0, label="Five modes"),
-        Line2D([], [], color="#333338", lw=0.94, ls=(0, (3.4, 2.4)), label="Two modes"),
+        Patch(facecolor=contour_colors[1], alpha=0.73, linewidth=0, label="Five-mode body"),
+        Line2D([], [], color="#333338", lw=0.94, ls=(0, (3.4, 2.4)), label="Two-mode centerline"),
     ]
-    silhouette.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.035),
-                      ncols=2, fontsize=9.3, frameon=False, borderaxespad=0,
-                      handlelength=1.36, handletextpad=0.4, columnspacing=1.0)
+    key.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.0, 0.88),
+               fontsize=9.7, frameon=False, borderaxespad=0,
+               handlelength=1.4, handletextpad=0.55, labelspacing=0.55)
+    silhouette.apply_aspect()
+    scale_width = 0.25 * silhouette.get_position().width / np.ptp(silhouette.get_xlim())
+    figure.add_artist(Line2D((0.402, 0.402 + scale_width), (0.622, 0.622),
+                            transform=figure.transFigure, color="#333338", lw=2.3,
+                            solid_capstyle="butt"))
 
     edges = np.linspace(-11, 11, 100)
     frequency, _, _ = np.histogram2d(observations[:, 0], observations[:, 1], bins=(edges, edges))
@@ -191,8 +199,10 @@ def draw_figure(worms, basis, markov, output):
                              cmap="cmr.ember_r", norm=LogNorm(0.003, 1))
     occupation.scatter(modes[:, 0], modes[:, 1], s=18, c=contour_colors, edgecolors="white", lw=0.45)
     occupation.set(xlabel="$a_1$", ylabel="$a_2$", xticks=(-8, 0, 8), yticks=(-8, 0, 8))
+    occupation.xaxis.labelpad = 0.5
     occupation.set_aspect("equal", adjustable="box")
-    field_colorbar(figure, occupation, mesh, [0.01, 0.1, 1], ["0.01", "0.1", "1"])
+    field_colorbar(figure, occupation, mesh, [0.01, 0.1, 1], ["0.01", "0.1", "1"],
+                   cax=occupancy_scale)
 
     span = float(np.ceil(np.quantile(np.abs(field.compressed()), 0.96)))
     mesh = drift.imshow(field.T, origin="lower", interpolation="nearest", aspect="auto",
@@ -216,7 +226,7 @@ def draw_figure(worms, basis, markov, output):
 
     for axis in (occupation, drift, memories):
         style_axis(axis)
-    for label, (x, y) in zip("ABCD", ((0.014, 0.967), (0.519, 0.967),
+    for label, (x, y) in zip("ABCD", ((0.014, 0.967), (0.592, 0.967),
                                      (0.014, 0.490), (0.519, 0.490))):
         figure.text(x, y, label, fontsize=11.5, va="top", ha="left", fontweight="normal")
 
