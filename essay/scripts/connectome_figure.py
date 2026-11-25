@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FFMpegWriter, FuncAnimation
 from matplotlib.collections import LineCollection
 from matplotlib.colors import Normalize, SymLogNorm
+from matplotlib.lines import Line2D
 from matplotlib.ticker import FixedLocator
 import numpy as np
 
@@ -130,35 +131,58 @@ def write_figure(anatomy, touch, sham):
     paths = [case["xy"] for case in (touch, sham)]
     fig = plt.figure(figsize=(6.85, 3.02))
     grid = fig.add_gridspec(3, 2, height_ratios=[.89, .085, 1.55], hspace=.25, wspace=.25,
-                           left=.083, right=.989, top=.95, bottom=.075)
+                           left=.104, right=.985, top=.955, bottom=.123)
     for column, (t, label) in enumerate(zip(TIME_LEVELS[:2], "AB")):
         ax = fig.add_subplot(grid[0, column])
         scatter = atlas_panel(ax, anatomy, label)
         scatter.set_array(dv[np.argmin(np.abs(times - t))])
+        ax.text(.99, .96, f"{t:.2f} s", transform=ax.transAxes, ha="right", va="top")
+        length = 100 / anatomy["source"]["lengthMicrometers"]
+        ax.text(.044 + length, -.054, "100 μm", ha="left", va="center", fontsize=7.2)
+        if column == 1:
+            ax.legend(
+                handles=[
+                    Line2D([], [], marker="o", ls="", mfc="none", mec=INK, ms=4, mew=.65,
+                           label="PLM input"),
+                    Line2D([], [], color="#4e725a", lw=.7, ls="--", label="Gap junction"),
+                ],
+                loc="lower right", bbox_to_anchor=(.994, -.04), ncols=2, frameon=False,
+                fontsize=7.2, handlelength=1.28,
+                columnspacing=.85, handletextpad=.4, borderaxespad=0,
+            )
     bar_ax = fig.add_subplot(grid[1, :])
     bar_box = bar_ax.get_position()
     bar_ax.set_position([.347, bar_box.y0, .306, bar_box.height])
     bar = fig.colorbar(mpl.cm.ScalarMappable(norm=LIMIT, cmap=ACTIVITY), cax=bar_ax,
                        orientation="horizontal", ticks=[-50, 0, 50], extend="both")
+    bar.set_ticks([-50, 0, 50], labels=["−50", "0", "+50"])
+    bar.ax.minorticks_off()
     bar.ax.tick_params(labelsize=8, length=1.8, pad=1)
     bar.outline.set_linewidth(.45)
     bar.ax.text(1.115, .5, r"$\Delta V$ (mV)", transform=bar.ax.transAxes, ha="left", va="center")
-    tick_labels = ["0.5", "2.5", "14"]
-    for column, (xy, label) in enumerate(zip(paths, "CD")):
+    for column, (xy, label, condition) in enumerate(zip(paths, "CD", ("Touch", "Sham"))):
         ax = fig.add_subplot(grid[2, column])
         body_panel(ax, paths, label)
+        ax.set_xlabel(r"$x$ (model units)", labelpad=1)
+        ax.text(.095, .937, condition, transform=ax.transAxes, ha="left", va="top", fontsize=8)
         centroid = xy.mean(axis=1)
-        ax.plot(*centroid.T, c="#9a9fa4", lw=.88, zorder=1)
-        for index, (t, tick) in enumerate(zip(TIME_LEVELS, tick_labels)):
+        centroid_line, = ax.plot(*centroid.T, c="#9a9fa4", lw=.88, zorder=1, label="Centroid")
+        times_legend = []
+        for index, t in enumerate(TIME_LEVELS):
             frame = np.argmin(np.abs(times - t))
             paint = TRACE(.21 + .24 * index)
             body_pose(ax, xy[frame], anatomy["outline"], paint, .78, .95)
             ax.plot(*xy[frame, 0], "o", c=paint, markersize=2.5)
-            if column == 1:
-                ax.text(.96, .93 - .092 * index, tick + " s", transform=ax.transAxes,
-                        color=paint, ha="right", va="top", fontsize=8)
+            times_legend.append(Line2D([], [], color=paint, lw=1, marker="o", markersize=2,
+                                       label=f"{t:.2f} s"))
+        legend = times_legend if column == 1 else [centroid_line]
+        position = "lower left" if column == 1 else "upper right"
+        ax.legend(handles=legend, loc=position, frameon=False, fontsize=7.2, handlelength=1.2,
+                  handletextpad=.4, labelspacing=.2, borderaxespad=.4)
         if column == 1:
             ax.tick_params(labelleft=False)
+        else:
+            ax.set_ylabel(r"$y$ (model units)", labelpad=1)
     output = ESSAY / "figures" / "connectome.pdf"
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output)

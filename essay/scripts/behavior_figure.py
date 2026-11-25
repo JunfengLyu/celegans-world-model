@@ -13,6 +13,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm, TwoSlopeNorm
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 import numpy as np
 from threadpoolctl import threadpool_limits
 
@@ -138,10 +140,13 @@ def field_colorbar(figure, axis, mesh, ticks, labels):
 
 
 def draw_figure(worms, basis, markov, output):
+    from worm_render import draw_worm, load_cuticle_profile
+
     training = [worms[index] for index in SPLIT["train"]]
     observations = np.concatenate(training)
     observations = observations[np.isfinite(observations).all(axis=1)]
     start, frames, modes, full, reduced = example_contours(training[0], basis)
+    cuticle = load_cuticle_profile()
     phi_edges, omega_edges, field, counts = phase_drift(training)
     lag, markov_curve = markov_correlations(markov, lag_count=10)
     lags = lag * np.arange(len(markov_curve))
@@ -162,13 +167,21 @@ def draw_figure(worms, basis, markov, output):
 
     offsets = ((-0.57, 0.34), (0.57, 0.34), (-0.57, -0.32), (0.57, -0.32))
     for a, b, t, color, (x, y) in zip(full, reduced, frames, contour_colors, offsets):
-        silhouette.plot(a[:, 0] + x, a[:, 1] + y, color=color, lw=2.0, solid_capstyle="round")
-        silhouette.plot(b[:, 0] + x, b[:, 1] + y, color="#343434", lw=0.76, ls=(0, (3, 1.8)))
-        silhouette.plot(a[0, 0] + x, a[0, 1] + y, "o", ms=2.55, color=color)
+        draw_worm(silhouette, a + (x, y), cuticle, color, linewidth=0.48, alpha=0.73)
+        silhouette.plot(b[:, 0] + x, b[:, 1] + y, color="#333338", lw=0.94,
+                        ls=(0, (3.4, 2.4)), zorder=4)
         silhouette.text(x, y - 0.22, f"{t / FPS:.2f} s", ha="center", va="top")
-    silhouette.plot([-0.33, -0.08], [-0.77, -0.77], color="#383838", lw=1.1)
+    silhouette.plot([-0.25, 0.0], [-0.77, -0.77], color="#383838", lw=1.1)
+    silhouette.text(0.05, -0.77, "$0.25L$", ha="left", va="center", fontsize=9.2)
     silhouette.set(xlim=(-1.07, 1.07), ylim=(-0.86, 0.62), aspect="equal")
     silhouette.set_axis_off()
+    handles = [
+        Patch(facecolor=contour_colors[1], alpha=0.73, linewidth=0, label="Five modes"),
+        Line2D([], [], color="#333338", lw=0.94, ls=(0, (3.4, 2.4)), label="Two modes"),
+    ]
+    silhouette.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.035),
+                      ncols=2, fontsize=9.3, frameon=False, borderaxespad=0,
+                      handlelength=1.36, handletextpad=0.4, columnspacing=1.0)
 
     edges = np.linspace(-11, 11, 100)
     frequency, _, _ = np.histogram2d(observations[:, 0], observations[:, 1], bins=(edges, edges))
@@ -193,11 +206,13 @@ def draw_figure(worms, basis, markov, output):
     times = lags / FPS
     memories.axhline(0, color="#aaaaaa", linewidth=0.64)
     memories.fill_between(times, measured.min(axis=0), measured.max(axis=0), color=data_color, alpha=0.17)
-    memories.plot(times, measured.mean(axis=0), color=data_color, lw=1.55)
+    memories.plot(times, measured.mean(axis=0), color=data_color, lw=1.55, label="Observed")
     memories.plot(times, markov_curve, color=markov_color, lw=1.45, ls="--",
-                  marker="o", markersize=2.5, markeredgewidth=0)
-    memories.set(xlabel=r"$\tau$ (s)", ylabel=r"$C(\tau)$", xlim=(0, times[-1]),
+                  marker="o", markersize=2.5, markeredgewidth=0, label="Delay Markov")
+    memories.set(xlabel=r"Lag $\tau$ (s)", ylabel=r"Correlation $C(\tau)$", xlim=(0, times[-1]),
                  ylim=(-0.65, 1.06), xticks=(0, 2.5, 5.0, 7.5), yticks=(-0.5, 0, 0.5, 1))
+    memories.legend(loc="upper right", fontsize=9.3, frameon=False, borderaxespad=0.25,
+                    handlelength=1.7, handletextpad=0.45, labelspacing=0.2)
 
     for axis in (occupation, drift, memories):
         style_axis(axis)

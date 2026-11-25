@@ -49,7 +49,8 @@ def render(directory, output):
     worms = sorted({key[0] for key in distances})
     curves = load_scores(directory, worms)
     plt.rcParams.update({
-        "font.family": "DejaVu Sans", "font.size": 10, "axes.linewidth": 0.65,
+        "font.family": "DejaVu Sans", "font.size": 9, "axes.linewidth": 0.65,
+        "axes.labelsize": 8.5, "axes.labelpad": 2,
         "axes.spines.top": False, "axes.spines.right": False,
         "xtick.major.width": 0.6, "ytick.major.width": 0.6,
         "xtick.major.size": 2.5, "ytick.major.size": 2.5,
@@ -57,7 +58,7 @@ def render(directory, output):
         "pdf.fonttype": 42,
     })
     fig, axes = plt.subplots(2, 2, figsize=(6.85, 3.02))
-    fig.subplots_adjust(left=0.054, right=0.99, bottom=0.083, top=0.93, wspace=0.22, hspace=0.44)
+    fig.subplots_adjust(left=0.098, right=0.985, bottom=0.152, top=0.84, wspace=0.33, hspace=0.68)
     maximum_rmse = max(curve.max() for curve in curves.values())
 
     for panel, worm in zip(axes[0], worms):
@@ -66,7 +67,7 @@ def render(directory, output):
             panel.fill_between(HORIZONS, samples.min(axis=0), samples.max(axis=0),
                                color=color, alpha=0.14, linewidth=0)
             panel.plot(HORIZONS, samples.mean(axis=0), color=color, marker=marker,
-                       markersize=3.0, linewidth=1.2)
+                       markersize=3.0, linewidth=1.2, label=arm)
         panel.set_xscale("log", base=2)
         panel.set_xlim(0.056, 4.5)
         panel.set_ylim(0, maximum_rmse * 1.05)
@@ -74,6 +75,8 @@ def render(directory, output):
         panel.xaxis.set_major_formatter(FixedFormatter(("0.063", "0.25", "0.5", "1", "2", "4")))
         panel.xaxis.set_minor_locator(NullLocator())
         panel.yaxis.set_major_locator(MaxNLocator(4))
+        panel.set_xlabel("Horizon (s)")
+    axes[0, 0].set_ylabel("Normalized RMSE")
 
     for measure, panel in enumerate(axes[1]):
         for group, worm in enumerate(worms):
@@ -86,6 +89,13 @@ def render(directory, output):
         panel.set_xlim(-0.4, len(worms) - 0.6)
         panel.set_xticks(range(len(worms)), [str(worm) for worm in worms])
         panel.yaxis.set_major_locator(MaxNLocator(4))
+        panel.set_xlabel("Held-out worm")
+    axes[1, 0].set_ylabel(r"Radius $W_1$")
+    axes[1, 1].set_ylabel("Phase speed $W_1$\n(cycles/s)")
+
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(.54, .986),
+               frameon=False, ncols=2, handlelength=1.5, columnspacing=1.15, borderaxespad=0)
 
     for panel, letter in zip(axes.flat, "ABCD"):
         panel.annotate(letter, (0, 1), xycoords="axes fraction", xytext=(-1, 2),

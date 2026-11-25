@@ -10,6 +10,7 @@ mpl.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import Normalize
+from matplotlib.lines import Line2D
 import numpy as np
 from sklearn.decomposition import PCA
 import torch
@@ -24,6 +25,7 @@ from wormlab.rssm import CategoricalRSSM
 
 INK = "#242731"
 GRAY = "#9499a2"
+OBSERVED_LINESTYLE = (0, (2, 1.2))
 TIME_NORM = Normalize(0, 4)
 TIME_MAP = mpl.colormaps["cmr.cosmic"].resampled(256)
 FORCE_MAP = mpl.colormaps["cmr.fusion_r"]
@@ -98,9 +100,9 @@ def mark(ax, label):
     ax.text(-.17, 1.14, label, transform=ax.transAxes, ha="left", va="top", fontsize=10, color=INK)
 
 
-def draw_latent_panel(ax, projection, observed, autonomous):
+def draw_latent_panel(ax, model, projection, observed, autonomous):
     observed, autonomous = projection.transform(observed), projection.transform(autonomous)
-    ax.plot(*observed.T, color=GRAY, lw=.9, ls=(0, (2, 1.2)), alpha=.85)
+    ax.plot(*observed.T, color=GRAY, lw=.9, ls=OBSERVED_LINESTYLE, alpha=.85)
     ax.scatter(*observed[-1], marker="x", color=GRAY, lw=.85, s=16, zorder=4)
     segments = np.stack((autonomous[:-1], autonomous[1:]), axis=1)
     paths = LineCollection(segments, cmap=TIME_MAP, norm=TIME_NORM, lw=1.25, zorder=3)
@@ -111,7 +113,7 @@ def draw_latent_panel(ax, projection, observed, autonomous):
     ax.autoscale()
     ax.margins(.10)
     pc1, pc2 = 100 * projection.explained_variance_ratio_
-    ax.set_xlabel(f"PC1 ({pc1:.0f}%)")
+    ax.set_xlabel(f"{model} PC1 ({pc1:.0f}%)")
     ax.set_ylabel(f"PC2 ({pc2:.0f}%)")
     ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(4))
     ax.yaxis.set_major_locator(mpl.ticker.MaxNLocator(4))
@@ -173,19 +175,29 @@ def main():
     gru_axis = fig.add_subplot(grid[1, 0])
     rssm_axis = fig.add_subplot(grid[1, 1])
     draw_neural_panels(fig, voltage_axis, force_axis, force_color_axis)
-    for ax, method in ((gru_axis, gru_embedding), (rssm_axis, rssm_embedding)):
-        percentages = draw_latent_panel(ax, *method(train, example))
+    for ax, model, method in ((gru_axis, "GRU", gru_embedding), (rssm_axis, "RSSM", rssm_embedding)):
+        percentages = draw_latent_panel(ax, model, *method(train, example))
         print(f"{method.__name__}: PC1 {percentages[0]:.2f}%, PC2 {percentages[1]:.2f}%")
     for label, axis in zip("ABCD", (voltage_axis, force_axis, gru_axis, rssm_axis)):
         mark(axis, label)
     color_axis = fig.add_subplot(grid[2, :2])
     box = color_axis.get_position()
-    color_axis.set_position([.376, box.y0 - .02, .227, .016])
+    color_axis.set_position([.610, box.y0 - .02, .180, .016])
     color = fig.colorbar(mpl.cm.ScalarMappable(norm=TIME_NORM, cmap=TIME_MAP), cax=color_axis,
                          orientation="horizontal", ticks=[0, 2, 4])
     color.ax.tick_params(labelsize=7.2, pad=1, length=1.8)
     color.outline.set_linewidth(.45)
-    color.ax.text(1.14, .5, r"Rollout $t$ (s)", transform=color.ax.transAxes, ha="left", va="center")
+    color.ax.text(1.15, .5, r"Autonomous $t$ (s)", transform=color.ax.transAxes,
+                  ha="left", va="center", fontsize=7.2)
+    fig.legend(
+        handles=[
+            Line2D([], [], color=GRAY, lw=.95, ls=OBSERVED_LINESTYLE, label="Observed input"),
+            Line2D([], [], marker="o", ls="", mfc="white", mec=INK, ms=3.4, mew=.72, label="Start"),
+            Line2D([], [], marker="x", ls="", color=INK, ms=3.4, mew=.8, label="End"),
+        ],
+        loc="center left", bbox_to_anchor=(.105, box.y0 - .01), frameon=False, ncols=3,
+        fontsize=7.2, handlelength=1.4, handletextpad=.45, columnspacing=1.2,
+    )
     print(f"PCA reference: {len(reference)} train histories, held-out example {example_index.tolist()}")
     output = ESSAY / "figures" / "virtual-dynamics.pdf"
     output.parent.mkdir(parents=True, exist_ok=True)
