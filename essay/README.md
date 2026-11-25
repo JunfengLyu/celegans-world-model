@@ -1,4 +1,4 @@
-# Neuroethology final essay
+# Phase–amplitude dynamics in a virtual *C. elegans*
 
 The three H.264 originals are in [`demos/`](demos) and stream on the [project's GitHub Pages site](https://junfenglyu.github.io/celegans-world-model/). The analysis and plotting scripts below reproduce the figures and movies used in the essay.
 
@@ -35,6 +35,6 @@ The matched fits, checkpoints, per-worm metrics, and paired rollouts are generat
 |---|---|
 | `connectome.pdf` | Atlas registration and matched modWorm posterior-touch and sham outputs |
 | `virtual-dynamics.pdf` | Simulated voltage and forces, the benchmark GRU and RSSM checkpoints, and a held-out observed sequence |
-| `behavior.pdf` | Public posture time series and fitted delay-Markov transition matrix |
-| `hybrid.pdf` and `embedding-dynamics.pdf` | Matched GRU forecasts, distributions, and first-window paired examples |
+| `behavior.pdf` | Public posture time series, an atlas cuticle profile, and the fitted delay-Markov matrix |
+| `hybrid.pdf` and `embedding-dynamics.pdf` | Matched GRU forecasts, distributions, and first-window examples rendered with the same cuticle profile |
 | `video-snapshots.pdf` | Five decoded frames from the released `hybrid-rollout.mp4` |

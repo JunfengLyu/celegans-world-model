@@ -163,7 +163,7 @@ def main():
     candidates = np.load(ARTIFACTS / "benchmark" / "test_windows.npy")
     example_index = candidates[candidates[:, 0] == 6][:1]
     example = torch.from_numpy(take_windows(worms, example_index, HISTORY + 4 * FPS))
-    fig = plt.figure(figsize=(6.85, 3.82))
+    fig = plt.figure(figsize=(6.85, 4.40))
     grid = fig.add_gridspec(3, 3, width_ratios=[1, 1, .055], height_ratios=[1, 1, .06],
                            left=.114, right=.947, bottom=.085, top=.928,
                            wspace=.36, hspace=.58)
